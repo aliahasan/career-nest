@@ -65,7 +65,6 @@ export const login = async (req, res) => {
         success: false,
       });
     }
-
     // Check if the role matches
     if (role !== user.role) {
       return res.status(403).json({
@@ -73,7 +72,6 @@ export const login = async (req, res) => {
         success: false,
       });
     }
-
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, email: user.email },
@@ -91,12 +89,7 @@ export const login = async (req, res) => {
         maxAge: 24 * 60 * 60 * 1000,
       })
       .json({
-        user: {
-          _id: user._id,
-          email: user.email,
-          fullName: user.fullName,
-          role: user.role,
-        },
+        user,
         message: "Login successful",
         success: true,
       });
