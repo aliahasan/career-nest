@@ -12,12 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+
 const Login = () => {
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
-    phone: "",
     password: "",
+    role: "", 
   });
 
   const handleInputChange = (e) => {
@@ -33,16 +33,14 @@ const Login = () => {
     // Here you would typically send the form data to your backend
     console.log("Form submitted:", formData);
     // Reset form after submission
-    setFormData({ name: "", email: "", password: "", phone: "" });
+    setFormData({ email: "", password: "", role: "" }); // Reset the role as well
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Login
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
           <CardDescription className="text-center">
             Login to your account
           </CardDescription>
@@ -73,6 +71,32 @@ const Login = () => {
                   onChange={handleInputChange}
                   required
                 />
+              </div>
+              <div className="flex gap-4">
+                <div className="flex items-center space-x-2">
+                  <Input
+                    type="radio"
+                    name="role"
+                    value="student"
+                    id="student"
+                    checked={formData.role === "student"}
+                    onChange={handleInputChange}
+                    className="cursor-pointer"
+                  />
+                  <Label htmlFor="student">Student</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    type="radio"
+                    name="role"
+                    value="recruiter"
+                    id="recruiter"
+                    checked={formData.role === "recruiter"}
+                    onChange={handleInputChange}
+                    className="cursor-pointer"
+                  />
+                  <Label htmlFor="recruiter">Recruiter</Label>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -107,4 +131,5 @@ const Login = () => {
     </div>
   );
 };
+
 export default Login;

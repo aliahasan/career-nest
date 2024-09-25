@@ -15,26 +15,34 @@ import { FcGoogle } from "react-icons/fc";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
     password: "",
+    role: "student",
+    image: null,
   });
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, files, type } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: type === "file" ? files[0] : value, // Handle file input
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would typically send the form data to your backend
     console.log("Form submitted:", formData);
     // Reset form after submission
-    setFormData({ name: "", email: "", password: "", phone: "" });
+    setFormData({
+      fullName: "",
+      email: "",
+      phoneNumber: "",
+      password: "",
+      role: "student",
+      image: null,
+    });
   };
 
   return (
@@ -45,19 +53,19 @@ const Register = () => {
             Register
           </CardTitle>
           <CardDescription className="text-center">
-            Create a new account
+            Create an account to get started
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent>
-            <div className="grid w-full items-center gap-4">
+            <div className="grid w-full gap-4">
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
-                  name="name"
+                  name="fullName"
                   placeholder="John Doe"
-                  value={formData.name}
+                  value={formData.fullName}
                   onChange={handleInputChange}
                   required
                 />
@@ -78,10 +86,10 @@ const Register = () => {
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
                   id="phone"
-                  name="phone"
+                  name="phoneNumber"
                   type="tel"
                   placeholder="0123..."
-                  value={formData.phone}
+                  value={formData.phoneNumber}
                   onChange={handleInputChange}
                   required
                 />
@@ -97,40 +105,75 @@ const Register = () => {
                   required
                 />
               </div>
-              <div className="flex flex-col space-y-1.5">
-            
+
+              {/* Role Selection and Image Upload */}
+              <div className="flex flex-col md:flex-row gap-4 md:items-center mt-4">
+                {/* Image Upload Input */}
+                <div className="flex flex-col space-y-1.5">
+                  <Input
+                    id="image"
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleInputChange}
+                    className="cursor-pointer"
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      type="radio"
+                      name="role"
+                      value="student"
+                      id="student"
+                      checked={formData.role === "student"}
+                      onChange={handleInputChange}
+                      className="cursor-pointer"
+                    />
+                    <Label htmlFor="student">Student</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      type="radio"
+                      name="role"
+                      value="recruiter"
+                      id="recruiter"
+                      checked={formData.role === "recruiter"}
+                      onChange={handleInputChange}
+                      className="cursor-pointer"
+                    />
+                    <Label htmlFor="recruiter">Recruiter</Label>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-2">
+          <CardFooter className="flex flex-col ">
             <Button type="submit" className="w-full">
               Register
             </Button>
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center gap-2 my-2"
+              className="w-full flex items-center justify-center gap-2 mt-4"
             >
               <FcGoogle className="w-5 h-5" />
               Sign up with Google
             </Button>
+            <p className="mt-4 text-center">
+              Already have an account? Please{" "}
+              <Link
+                className="text-blue-500 hover:underline hover:underline-offset-4"
+                to="/login"
+              >
+                Login
+              </Link>
+            </p>
           </CardFooter>
-          <CardContent>
-            <div className="text-center">
-              <p>
-                Already have an account? Please{" "}
-                <Link
-                  className=" hover:underline hover:underline-offset-4 text-blue-500"
-                  to="/login"
-                >
-                  Login
-                </Link>
-              </p>
-            </div>
-          </CardContent>
         </form>
       </Card>
     </div>
   );
 };
+
 export default Register;
