@@ -10,8 +10,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import useAuth from "@/hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -23,6 +25,9 @@ const Register = () => {
     image: null,
   });
 
+  const { user, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
+  console.log(user);
   const handleInputChange = (e) => {
     const { name, value, files, type } = e.target;
     setFormData((prevData) => ({
@@ -43,6 +48,16 @@ const Register = () => {
       role: "student",
       image: null,
     });
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      toast.success("Signed in with Google")
+      navigate("/");
+    } catch (error) {
+     toast.error(error?.message)
+    }
   };
 
   return (
@@ -156,6 +171,7 @@ const Register = () => {
               type="button"
               variant="outline"
               className="w-full flex items-center justify-center gap-2 mt-4"
+              onClick={handleGoogleSignIn}
             >
               <FcGoogle className="w-5 h-5" />
               Sign up with Google

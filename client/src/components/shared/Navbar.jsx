@@ -6,18 +6,29 @@ import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { LogOut, User2 } from "lucide-react";
+import useAuth from "@/hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const user = false;
+  const {user , logout} = useAuth();
   const links = [
     { title: "Home", path: "/" },
     { title: "About", path: "/about" },
     { title: "Jobs", path: "/jobs" },
     { title: "Dashboard", path: "/dashboard" },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully")
+    } catch (error) {
+      toast.error(error?.message)
+    }
+  }
 
   // Handle scroll effect
   useEffect(() => {
@@ -40,19 +51,19 @@ const Navbar = () => {
       <Popover>
         <PopoverTrigger asChild>
           <Avatar className="cursor-pointer w-8 h-8">
-            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarImage src={user?.photoURL} />
             <AvatarFallback>Jon Doe</AvatarFallback>
           </Avatar>
         </PopoverTrigger>
         <PopoverContent className="w-64 p-4">
           <div className="flex items-center space-x-4 mb-4">
             <Avatar className="w-8 h-8">
-              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarImage src={user?.photoURL} />
               <AvatarFallback>John Doe</AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold">{user?.name}</h3>
-              <p className="text-sm text-gray-500">user@gmail.com</p>
+              <h3 className="font-semibold">{user?.displayName}</h3>
+              <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
           </div>
           <div className="flex flex-col space-y-2">
@@ -65,6 +76,7 @@ const Navbar = () => {
             <Button
               variant="link"
               className="justify-start text-red-500 hover:text-red-800"
+              onClick={handleLogout}
             >
               <LogOut className="mr-2 h-4 w-4 " />
               Logout

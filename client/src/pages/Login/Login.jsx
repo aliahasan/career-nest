@@ -10,14 +10,29 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import useAuth from "@/hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Login = () => {
+  const { signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      toast.success("login successful");
+      navigate("/");
+    } catch (error) {
+      toast.error(error?.message);
+    }
+  };
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: "", 
+    role: "",
   });
 
   const handleInputChange = (e) => {
@@ -40,7 +55,9 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">
+            Login
+          </CardTitle>
           <CardDescription className="text-center">
             Login to your account
           </CardDescription>
@@ -108,6 +125,7 @@ const Login = () => {
               type="button"
               variant="outline"
               className="w-full flex items-center justify-center gap-2 my-2"
+              onClick={handleGoogleSignIn}
             >
               <FcGoogle className="w-5 h-5" />
               Sign in with Google
