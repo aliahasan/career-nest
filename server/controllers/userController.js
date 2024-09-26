@@ -6,30 +6,37 @@ import bcrypt from "bcrypt";
 export const register = async (req, res) => {
   try {
     const { fullName, email, phoneNumber, password, role } = req.body;
+    console.log(req.body);
     if (!fullName || !email || !phoneNumber || !password || !role) {
       return res.status(400).json({
-        message: "Something went wrong",
+        message: "Provide all required information",
         success: false,
       });
     }
     const user = await User.findOne({ email: email });
     if (user) {
-      return res.status(400).json({
-        message: "User already exist with this email",
+      return res.status(409).json({
+        message: "user already exists with this email",
         success: false,
       });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({
+    const newUser = await User.create({
       fullName,
       email,
       phoneNumber,
       password: hashedPassword,
       role,
     });
+    return res.status(201).json({
+      message: "user created successfully",
+      success: true,
+      user: newUser,
+    });
   } catch (error) {
+    console.error("Register Error:", error);
     return res.status(500).json({
-      message: "Server Error",
+      message: "Internal server error",
       success: false,
     });
   }
@@ -39,6 +46,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
+    console.log(req.body);
 
     // Validate request body
     if (!email || !password || !role) {
@@ -81,7 +89,7 @@ export const login = async (req, res) => {
 
     // Set the token as an HTTP-only cookie and return user info
     return res
-      .status(201)
+      .status(200)
       .cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // Use secure cookies in production

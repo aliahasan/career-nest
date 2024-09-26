@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -12,51 +11,49 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import useAuth from "@/hooks/useAuth";
 import toast from "react-hot-toast";
+import { secureApi } from "@/hooks/useSecureApi";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading, signInWithGoogle } from "@/redux/authSlice";
+import { Loader2 } from "lucide-react";
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phoneNumber: "",
-    password: "",
-    role: "student",
-    image: null,
-  });
-
-  const { user, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
-  console.log(user);
-  const handleInputChange = (e) => {
-    const { name, value, files, type } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === "file" ? files[0] : value, // Handle file input
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const dispatch = useDispatch();
+  const { loading } = useSelector((store) => store.auth);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Reset form after submission
-    setFormData({
-      fullName: "",
-      email: "",
-      phoneNumber: "",
-      password: "",
-      role: "student",
-      image: null,
-    });
+    const form = e.target;
+    const formData = {
+      fullName: form.fullName.value,
+      email: form.email.value,
+      phoneNumber: form.phoneNumber.value,
+      password: form.password.value,
+      role: form.role.value,
+      image: form.image.files[0],
+    };
+    try {
+      dispatch(setLoading(true));
+      const response = await secureApi.post("/user/register", formData);
+      toast.success(response.data.message);
+      form.reset();
+      navigate("/login");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Registration failed");
+    } finally {
+      dispatch(setLoading(false));
+    }
   };
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithGoogle();
-      toast.success("Signed in with Google")
+      dispatch(setLoading(true));
+      await dispatch(signInWithGoogle());
       navigate("/");
     } catch (error) {
-     toast.error(error?.message)
+      toast.error(error?.message);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
@@ -75,13 +72,11 @@ const Register = () => {
           <CardContent>
             <div className="grid w-full gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="fullName">Name</Label>
                 <Input
-                  id="name"
+                  id="fullName"
                   name="fullName"
                   placeholder="John Doe"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
                   required
                 />
               </div>
@@ -92,33 +87,22 @@ const Register = () => {
                   name="email"
                   type="email"
                   placeholder="john@example.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
                   required
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phoneNumber">Phone Number</Label>
                 <Input
-                  id="phone"
+                  id="phoneNumber"
                   name="phoneNumber"
                   type="tel"
                   placeholder="0123..."
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
                   required
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                />
+                <Input id="password" name="password" type="password" required />
               </div>
 
               {/* Role Selection and Image Upload */}
@@ -128,9 +112,9 @@ const Register = () => {
                   <Input
                     id="image"
                     name="image"
+                    required
                     type="file"
                     accept="image/*"
-                    onChange={handleInputChange}
                     className="cursor-pointer"
                   />
                 </div>
@@ -141,8 +125,6 @@ const Register = () => {
                       name="role"
                       value="student"
                       id="student"
-                      checked={formData.role === "student"}
-                      onChange={handleInputChange}
                       className="cursor-pointer"
                     />
                     <Label htmlFor="student">Student</Label>
@@ -153,8 +135,6 @@ const Register = () => {
                       name="role"
                       value="recruiter"
                       id="recruiter"
-                      checked={formData.role === "recruiter"}
-                      onChange={handleInputChange}
                       className="cursor-pointer"
                     />
                     <Label htmlFor="recruiter">Recruiter</Label>
@@ -165,7 +145,14 @@ const Register = () => {
           </CardContent>
           <CardFooter className="flex flex-col ">
             <Button type="submit" className="w-full">
-              Register
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  Please wait...
+                </>
+              ) : (
+                "Register"
+              )}
             </Button>
             <Button
               type="button"

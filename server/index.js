@@ -1,9 +1,9 @@
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { connectDB } from "./utils/db.js";
-dotenv.config({});
 const app = express();
 const PORT = process.env.PORT || 3000;
 import userRoute from "./routes/userRoute.js";
@@ -32,8 +32,33 @@ app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
 app.use("/api/v1/application", applicationRoute);
 
-// MongoDB connection
-app.listen(PORT, () => {
-  connectDB();
-  console.log(`Server is running at port ${PORT}`);
-});
+function errorHandler(err, req, res, next) {
+  console.error(err);
+  const status = err.status || 500;
+  const message =
+    process.env.NODE_ENV === "development"
+      ? err.message
+      : "internal server error";
+
+  res.status(status).json({
+    status: "error",
+    message: message,
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+  });
+}
+app.use(errorHandler);
+
+// MongoDB connection and server start
+async function startServer() {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`sever is running on ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Error starting server:", error);
+    process.exit(1);
+  }
+}
+
+startServer();

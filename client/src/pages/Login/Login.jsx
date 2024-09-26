@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -12,45 +11,56 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import useAuth from "@/hooks/useAuth";
 import toast from "react-hot-toast";
+import { secureApi } from "@/hooks/useSecureApi";
+import { Loader2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading, setUser, signInWithGoogle } from "@/redux/authSlice";
 
 const Login = () => {
-  const { signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const { loading } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
 
-  const handleGoogleSignIn = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = {
+      email: form.email.value,
+      password: form.password.value,
+      role: form.role.value,
+    };
     try {
-      await signInWithGoogle();
-      toast.success("login successful");
-      navigate("/");
+      dispatch(setLoading(true));
+      const response = await secureApi.post("/user/login", formData);
+      if (response.data?.user) {
+        dispatch(setUser(response.data?.user));
+      }
+      if (response.data.success) {
+        toast.success("Login successful");
+        navigate("/");
+      } else {
+        toast.error(response.data.message);
+      }
     } catch (error) {
-      toast.error(error?.message);
+      toast.error(error?.response?.data?.message || "Login failed");
+    } finally {
+      dispatch(setLoading(false));
+      form.reset();
     }
   };
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    role: "",
-  });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleGoogleSignIn = async () => {
+    try {
+      dispatch(setLoading(true));
+      await dispatch(signInWithGoogle());
+      navigate("/");
+    } catch (error) {
+      toast.error(error?.message);
+    } finally {
+      dispatch(setLoading(false));
+    }
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Here you would typically send the form data to your backend
-    console.log("Form submitted:", formData);
-    // Reset form after submission
-    setFormData({ email: "", password: "", role: "" }); // Reset the role as well
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
       <Card className="w-full max-w-sm">
@@ -72,22 +82,13 @@ const Login = () => {
                   name="email"
                   type="email"
                   placeholder="john@example.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
                   required
                 />
               </div>
 
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                />
+                <Input id="password" name="password" type="password" required />
               </div>
               <div className="flex gap-4">
                 <div className="flex items-center space-x-2">
@@ -96,8 +97,6 @@ const Login = () => {
                     name="role"
                     value="student"
                     id="student"
-                    checked={formData.role === "student"}
-                    onChange={handleInputChange}
                     className="cursor-pointer"
                   />
                   <Label htmlFor="student">Student</Label>
@@ -108,8 +107,6 @@ const Login = () => {
                     name="role"
                     value="recruiter"
                     id="recruiter"
-                    checked={formData.role === "recruiter"}
-                    onChange={handleInputChange}
                     className="cursor-pointer"
                   />
                   <Label htmlFor="recruiter">Recruiter</Label>
@@ -119,7 +116,14 @@ const Login = () => {
           </CardContent>
           <CardFooter className="flex flex-col gap-2">
             <Button type="submit" className="w-full">
-              Login
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  Please wait...
+                </>
+              ) : (
+                "Login"
+              )}
             </Button>
             <Button
               type="button"

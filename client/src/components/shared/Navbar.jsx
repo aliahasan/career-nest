@@ -6,14 +6,16 @@ import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { LogOut, User2 } from "lucide-react";
-import useAuth from "@/hooks/useAuth";
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/redux/authSlice";
 
 const Navbar = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const {user , logout} = useAuth();
+  const {user} = useSelector((store) => store.auth);
   const links = [
     { title: "Home", path: "/" },
     { title: "About", path: "/about" },
@@ -21,13 +23,9 @@ const Navbar = () => {
     { title: "Dashboard", path: "/dashboard" },
   ];
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success("Logged out successfully")
-    } catch (error) {
-      toast.error(error?.message)
-    }
+  const handleLogout =  () => {
+    dispatch(logout())
+    toast.success("Logged out successfully")
   }
 
   // Handle scroll effect
@@ -62,7 +60,7 @@ const Navbar = () => {
               <AvatarFallback>John Doe</AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold">{user?.displayName}</h3>
+              <h3 className="font-semibold">{user?.displayName || user?.fullName}</h3>
               <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
           </div>
