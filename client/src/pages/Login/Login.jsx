@@ -36,11 +36,11 @@ const Login = () => {
       if (response.data?.user) {
         dispatch(setUser(response.data?.user));
       }
-      if (response.data.success) {
+      if (response.data?.success) {
         toast.success("Login successful");
         navigate("/");
       } else {
-        toast.error(response.data.message);
+        toast.error(response.data?.message);
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Login failed");

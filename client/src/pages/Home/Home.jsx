@@ -1,7 +1,17 @@
+import Hiring from "@/myComponents/Hiring";
+import CategorySection from "./CategorySection";
+import HeroSection from "./HeroSection";
+import NewsletterSection from "@/myComponents/NewsLetter";
+import LatestJob from "@/myComponents/LatestJob";
+
 const Home = () => {
   return (
     <div>
-      <h1>This is home page</h1>
+     <HeroSection/>
+     <CategorySection/>
+     <LatestJob/>
+     <Hiring/>
+     <NewsletterSection/>
     </div>
   );
 };
