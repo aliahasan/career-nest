@@ -1,7 +1,6 @@
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
-import DashNav from "./DashNav";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
 import {
   Popover,
@@ -9,19 +8,20 @@ import {
   PopoverTrigger,
 } from "../components/ui/popover";
 import { Button } from "../components/ui/button";
-import { LogOut, User2 } from "lucide-react";
+import { LogOut } from "lucide-react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/redux/authSlice";
+import { DashboardIcon } from "@radix-ui/react-icons";
 
 const Navbar = () => {
   const links = [
     { title: "Home", path: "/" },
     { title: "Jobs", path: "/jobs" },
+    { title: "Browse", path: "/browse" },
     { title: "About", path: "/about" },
-    { title: "Dashboard", path: "/dashboard" },
   ];
-  const location = useLocation();
+  // const location = useLocation();
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -38,9 +38,9 @@ const Navbar = () => {
     };
   }, []);
 
-  if (location.pathname.includes("/dashboard")) {
-    return <DashNav />;
-  }
+  // if (location.pathname.includes("/user/dashboard")) {
+  //   return <DashNav />;
+  // }
 
   const handleLogout = () => {
     try {
@@ -75,9 +75,9 @@ const Navbar = () => {
           </div>
           <div className="flex flex-col space-y-2">
             <Button variant="link" className="justify-start" asChild>
-              <Link to="/profile">
-                <User2 className="mr-2 h-4 w-4" />
-                View Profile
+              <Link to="/user/dashboard">
+                <DashboardIcon className="mr-2 h-4 w-4" />
+                Dashboard
               </Link>
             </Button>
             <Button
@@ -92,11 +92,8 @@ const Navbar = () => {
         </PopoverContent>
       </Popover>
     ) : (
-      <Link
-        to="/login"
-        
-      >
-       <Button>Login</Button>
+      <Link to="/login">
+        <Button>Login</Button>
       </Link>
     );
   };
@@ -132,7 +129,9 @@ const Navbar = () => {
         {/* Links section */}
         <ul
           className={`md:flex items-center gap-x-10 absolute md:static left-0 w-full md:w-auto  flex-col md:flex-row transition-all duration-500 ease-in-out  ${
-            isOpen ? "top-16 bg-gray-100" : "top-[-490px] md:top-auto"
+            isOpen
+              ? "top-16 bg-[#262D3E] text-white"
+              : "top-[-490px] md:top-auto"
           }`}
         >
           {links.map((link, index) => (

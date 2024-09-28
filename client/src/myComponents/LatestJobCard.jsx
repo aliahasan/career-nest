@@ -1,17 +1,17 @@
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Briefcase, MapPin, Clock, DollarSign } from 'lucide-react'
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Briefcase, MapPin, Clock, DollarSign } from "lucide-react";
 
-const LatestJobCard = ({job}) => {
+const LatestJobCard = ({ job }) => {
   return (
     <Card className="w-full max-w-xl mx-auto hover:shadow-md transition-shadow duration-300">
       <CardContent className="pt-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-              <img 
-                src={job?.companyLogo || "/placeholder.svg?height=48&width=48"} 
+              <img
+                src={job?.companyLogo || "/placeholder.svg?height=48&width=48"}
                 alt={`${job?.company} logo`}
                 className="w-8 h-8 object-contain"
               />
@@ -21,14 +21,14 @@ const LatestJobCard = ({job}) => {
               <p className="text-sm text-gray-500">Company Name</p>
             </div>
           </div>
-          <Badge variant={job?.type === 'Full-time' ? 'default' : 'secondary'}>
-          Job Type
+          <Badge variant={job?.type === "Full-time" ? "default" : "secondary"}>
+            Job Type
           </Badge>
         </div>
         <div className="space-y-2 mb-4">
           <div className="flex items-center text-sm text-gray-500">
             <MapPin className="w-4 h-4 mr-2" />
-           Bangladesh
+            Bangladesh
           </div>
           <div className="flex items-center text-sm text-gray-500">
             <Briefcase className="w-4 h-4 mr-2" />
@@ -43,7 +43,7 @@ const LatestJobCard = ({job}) => {
             {job?.salary}
           </div>
         </div>
-              <p className="text-sm text-gray-600 mb-4">{job?.description}</p>
+        <p className="text-sm text-gray-600 mb-4">{job?.description}</p>
         <div className="flex flex-wrap gap-2">
           {job?.skills.map((skill, index) => (
             <Badge key={index} variant="outline" className="bg-blue-50">
@@ -54,12 +54,12 @@ const LatestJobCard = ({job}) => {
       </CardContent>
       <CardFooter className="flex justify-between items-center bg-gray-50 py-5">
         <Button variant="outline" className="text-blue-600 hover:text-blue-800">
-          Save Job
+          Save for later
         </Button>
-        <Button>Apply Now</Button>
+        <Button>See details</Button>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
 
-export default LatestJobCard
+export default LatestJobCard;

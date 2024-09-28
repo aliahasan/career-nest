@@ -9,8 +9,8 @@ const LatestJob = () => {
         Latest & <span>Trending Jobs</span>
       </h1>
       {/* multiple jobs cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-5  px-2 md:px-0">
-        {jobs?.map((job, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-5  px-2 lg:px-0">
+        {jobs?.slice(0, 6).map((job, index) => (
           <LatestJobCard key={index} />
         ))}
       </div>
