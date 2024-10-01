@@ -1,30 +1,5 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import auth from "@/firebase/firebase.config";
-
-const googleProvider = new GoogleAuthProvider();
-
-export const signInWithGoogle = createAsyncThunk(
-  "auth/signInWithGoogle",
-  async (_, { rejectWithValue }) => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      return {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-      };
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const logout = createAsyncThunk("auth/logout", async () => {
-  await signOut(auth);
-});
+import { createSlice } from "@reduxjs/toolkit";
+import { logout, signInWithGoogle } from "./firebaseUser";
 
 const authSlice = createSlice({
   name: "auth",
@@ -39,6 +14,7 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
       state.loading = false;
+      localStorage.setItem("user", JSON.stringify(action.payload));
     },
   },
   extraReducers: (builder) => {

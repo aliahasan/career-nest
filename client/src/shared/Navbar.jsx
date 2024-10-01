@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
@@ -11,8 +11,9 @@ import { Button } from "../components/ui/button";
 import { LogOut } from "lucide-react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "@/redux/authSlice";
 import { DashboardIcon } from "@radix-ui/react-icons";
+import { logout } from "@/redux/firebaseUser";
+import { setUser } from "@/redux/authSlice";
 
 const Navbar = () => {
   const links = [
@@ -26,6 +27,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user } = useSelector((store) => store.auth);
+  const navigate = useNavigate();
 
   // Handle scroll effect
   useEffect(() => {
@@ -38,16 +40,14 @@ const Navbar = () => {
     };
   }, []);
 
-  // if (location.pathname.includes("/user/dashboard")) {
-  //   return <DashNav />;
-  // }
-
-  const handleLogout = () => {
+  const handleLogout = async () => {
     try {
-      dispatch(logout());
-      toast.success("Logged out successfully");
+      await dispatch(logout()).unwrap();
+      await dispatch(setUser(null));
+      toast.success("logout successful");
+      navigate("/");
     } catch (error) {
-      toast.error(error?.message || "Logout failed");
+      toast.error(error?.message || "logout failed");
     }
   };
   // User avatar or login button
@@ -102,7 +102,7 @@ const Navbar = () => {
     <nav
       className={`sticky top-0 bg-white/60 backdrop-blur-md border-b left-0 w-full z-50 transition-colors duration-300 ${
         scrolled
-          ? "bg-white/60 backdrop-blur-md border-b" // Glassmorphism effect on scroll
+          ? "bg-white/60 backdrop-blur-md border-b" //
           : "bg-white/20 backdrop-blur-none" // Transparent when at the top
       }`}
     >
@@ -130,7 +130,7 @@ const Navbar = () => {
         <ul
           className={`md:flex items-center gap-x-10 absolute md:static left-0 w-full md:w-auto  flex-col md:flex-row transition-all duration-500 ease-in-out  ${
             isOpen
-              ? "top-16 bg-[#262D3E] text-white"
+              ? "top-16 bg-gray-50 text-[#262D3E] shadow-sm"
               : "top-[-490px] md:top-auto"
           }`}
         >

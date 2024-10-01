@@ -1,4 +1,4 @@
-import { logout } from "@/redux/authSlice";
+import { logout } from "@/redux/firebaseUser";
 import axios from "axios";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";

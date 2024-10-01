@@ -15,7 +15,8 @@ import toast from "react-hot-toast";
 import { secureApi } from "@/hooks/useSecureApi";
 import { Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading, setUser, signInWithGoogle } from "@/redux/authSlice";
+import { setLoading, setUser } from "@/redux/authSlice";
+import { signInWithGoogle } from "@/redux/firebaseUser";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -30,11 +31,14 @@ const Login = () => {
       password: form.password.value,
       role: form.role.value,
     };
+
     try {
       dispatch(setLoading(true));
+
       const response = await secureApi.post("/user/login", formData);
+      console.log(response)
       if (response.data?.user) {
-        dispatch(setUser(response.data?.user));
+        dispatch(setUser(response?.data?.user));
       }
       if (response.data?.success) {
         toast.success("Login successful");
@@ -53,10 +57,17 @@ const Login = () => {
   const handleGoogleSignIn = async () => {
     try {
       dispatch(setLoading(true));
-      await dispatch(signInWithGoogle());
-      navigate("/");
+      const result = await dispatch(signInWithGoogle()).unwrap();
+      if (result) {
+        dispatch(setUser(result));
+        toast.success("Successfully logged in with Google");
+        navigate("/");
+      } else {
+        toast.error("Failed to log in with Google");
+      }
     } catch (error) {
-      toast.error(error?.message);
+      console.error("Google Sign-In Error:", error);
+      toast.error(error?.message || "Failed to log in with Google");
     } finally {
       dispatch(setLoading(false));
     }

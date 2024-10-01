@@ -1,9 +1,10 @@
 import { X } from "lucide-react";
-import { useState } from "react";
+import {  useState } from "react";
 import { AiOutlineBars } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
+
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => {
@@ -29,7 +30,7 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 bg-gray-100 w-64 h-screen z-30 transform transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col ${
+        className={`fixed inset-y-0 left-0 bg-gray-50 w-64 h-screen z-30 transform transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -41,9 +42,9 @@ const Sidebar = () => {
         </div>
 
         {/* Sidebar content: make scrollable */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
           <ul className="space-y-2">
-            {Array.from({ length: 40 }).map((_, idx) => (
+            {Array.from({ length: 5 }).map((_, idx) => (
               <li key={idx} className="p-2 bg-white shadow-sm rounded-md cursor-pointer">
                 Menu Item {idx + 1}
               </li>

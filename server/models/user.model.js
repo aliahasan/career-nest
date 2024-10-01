@@ -10,7 +10,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      // match: /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/,
     },
     phoneNumber: {
       type: String,
@@ -18,22 +17,34 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.isGoogleUser && this.isNew;
+      },
+      validate: {
+        validator: function (password) {
+          return this.isGoogleUser || (password && password.length > 0);
+        },
+        message: "password is required",
+      },
     },
     role: {
       type: String,
       enum: ["student", "recruiter"],
       required: true,
     },
+    photoURL: {
+      type: String,
+      default: "",
+    },
+    isGoogleUser: {
+      type: Boolean,
+      default: false,
+    },
     profile: {
       bio: { type: String },
       skills: [{ type: String }],
       resume: { type: String },
       resumeName: { type: String },
-      profilePicture: {
-        type: String,
-        default: "",
-      },
       company: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
     },
   },

@@ -10,11 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
 import { secureApi } from "@/hooks/useSecureApi";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading, signInWithGoogle } from "@/redux/authSlice";
+import { setLoading } from "@/redux/authSlice";
 import { Loader2 } from "lucide-react";
 
 const Register = () => {
@@ -24,34 +23,27 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
-    const formData = {
-      fullName: form.fullName.value,
-      email: form.email.value,
-      phoneNumber: form.phoneNumber.value,
-      password: form.password.value,
-      role: form.role.value,
-      image: form.image.files[0],
-    };
+    const formData = new FormData();
+    formData.append("fullName", form.fullName.value);
+    formData.append("email", form.email.value);
+    formData.append("phoneNumber", form.phoneNumber.value);
+    formData.append("password", form.password.value);
+    formData.append("role", form.role.value);
+    formData.append("file", form.file.files[0]);
+
     try {
       dispatch(setLoading(true));
-      const response = await secureApi.post("/user/register", formData);
+      const response = await secureApi.post("/user/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(response.data)
       toast.success(response.data.message);
       form.reset();
       navigate("/login");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Registration failed");
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    try {
-      dispatch(setLoading(true));
-      await dispatch(signInWithGoogle());
-      navigate("/");
-    } catch (error) {
-      toast.error(error?.message);
     } finally {
       dispatch(setLoading(false));
     }
@@ -110,8 +102,8 @@ const Register = () => {
                 {/* Image Upload Input */}
                 <div className="flex flex-col space-y-1.5">
                   <Input
-                    id="image"
-                    name="image"
+                    id="file"
+                    name="file"
                     required
                     type="file"
                     accept="image/*"
@@ -144,24 +136,15 @@ const Register = () => {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col ">
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  Please wait...
+                  please wait...
                 </>
               ) : (
                 "Register"
               )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2 mt-4"
-              onClick={handleGoogleSignIn}
-            >
-              <FcGoogle className="w-5 h-5" />
-              Sign up with Google
             </Button>
             <p className="mt-4 text-center">
               Already have an account? Please{" "}

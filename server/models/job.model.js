@@ -30,6 +30,10 @@ const jobSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    image: {
+      type: String,
+      default: "",
+    },
     jobCategory: {
       type: String,
       required: true,

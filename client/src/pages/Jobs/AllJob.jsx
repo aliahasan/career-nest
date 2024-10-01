@@ -1,15 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import {
-  Badge,
-  Bookmark,
-  Briefcase,
-  Clock,
-  DollarSign,
-  MapPin,
-} from "lucide-react";
+import { Badge, Briefcase, Clock, DollarSign, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const AllJob = ({ job }) => {
+  const jobId = "6adcaee65e4ffef"
   return (
     <div>
       <Card className="w-full max-w-xl mx-auto hover:shadow-md transition-shadow duration-300">
@@ -70,7 +65,7 @@ const AllJob = ({ job }) => {
           >
             Save Job
           </Button>
-          <Button>See details</Button>
+          <Link to={`/job-details/${jobId}`}>See details</Link>
         </CardFooter>
       </Card>
     </div>

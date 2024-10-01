@@ -1,13 +1,15 @@
 import App from "@/App";
 import DashLayout from "@/DashLayout/DashLayout";
-
+import AppliedJobs from "@/DashLayout/DashPage/AppliedJobs";
+import Dashboard from "@/DashLayout/DashPage/Dashboard";
+import Profile from "@/DashLayout/DashPage/Profile";
 import About from "@/pages/About/About";
 import Browse from "@/pages/Browse/Browse";
 import Home from "@/pages/Home/Home";
+import JobDetails from "@/pages/Jobs/JobDetails";
 import Jobs from "@/pages/Jobs/Jobs";
 import Login from "@/pages/Login/Login";
 import NotFound from "@/pages/NotFound/NotFound";
-import Profile from "@/pages/Profile/Profile";
 import Register from "@/pages/Register/Register";
 import { createBrowserRouter } from "react-router-dom";
 
@@ -34,6 +36,10 @@ const router = createBrowserRouter([
         path: "/jobs",
         element: <Jobs />,
       },
+      {
+        path: "/job-details/:id",
+        element: <JobDetails />,
+      },
     ],
   },
   {
@@ -47,12 +53,20 @@ const router = createBrowserRouter([
   {
     path: "/user/dashboard",
     element: <DashLayout />,
-    children:[
+    children: [
       {
-        path: "/user/dashboard/profile",
-        element:<Profile />
+        index: true,
+        element: <Dashboard></Dashboard>,
       },
-    ]
+      {
+        path: "profile",
+        element: <Profile />,
+      },
+      {
+        path: "applied-jobs",
+        element: <AppliedJobs />,
+      },
+    ],
   },
 ]);
 
