@@ -1,4 +1,4 @@
-import { logout } from "@/redux/firebaseUser";
+import { setUser } from "@/redux/authSlice";
 import axios from "axios";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -17,7 +17,7 @@ const useSecureApi = () => {
       (response) => response,
       async (error) => {
         if (error.response?.status === 401 || error.response?.status === 403) {
-          dispatch(logout())
+          dispatch(setUser(null))
           navigate("/login");
         }
         return Promise.reject(error);

@@ -12,8 +12,8 @@ import { LogOut } from "lucide-react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { DashboardIcon } from "@radix-ui/react-icons";
-import { logout } from "@/redux/firebaseUser";
 import { setUser } from "@/redux/authSlice";
+import { secureApi } from "@/hooks/useSecureApi";
 
 const Navbar = () => {
   const links = [
@@ -42,10 +42,12 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await dispatch(logout()).unwrap();
-      await dispatch(setUser(null));
-      toast.success("logout successful");
-      navigate("/");
+      const response = await secureApi.post("/user/logout");
+      if (response.data.success) {
+        dispatch(setUser(null));
+        toast.success("logout successful");
+        navigate("/");
+      }
     } catch (error) {
       toast.error(error?.message || "logout failed");
     }
@@ -75,7 +77,7 @@ const Navbar = () => {
           </div>
           <div className="flex flex-col space-y-2">
             <Button variant="link" className="justify-start" asChild>
-              <Link to="/user/dashboard">
+              <Link to="/user/dashboard/profile">
                 <DashboardIcon className="mr-2 h-4 w-4" />
                 Dashboard
               </Link>
@@ -102,8 +104,8 @@ const Navbar = () => {
     <nav
       className={`sticky top-0 bg-white/60 backdrop-blur-md border-b left-0 w-full z-50 transition-colors duration-300 ${
         scrolled
-          ? "bg-white/60 backdrop-blur-md border-b" //
-          : "bg-white/20 backdrop-blur-none" // Transparent when at the top
+          ? "bg-white/60 backdrop-blur-md border-b"
+          : "bg-white/20 backdrop-blur-none"
       }`}
     >
       <div className="flex items-center justify-between py-4 md:py-1 px-2">

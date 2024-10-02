@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { logout, signInWithGoogle } from "./firebaseUser";
 
 const authSlice = createSlice({
   name: "auth",
@@ -14,27 +13,13 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
       state.loading = false;
-      localStorage.setItem("user", JSON.stringify(action.payload));
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(signInWithGoogle.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(signInWithGoogle.fulfilled, (state, action) => {
-        state.user = action.payload;
-        state.loading = false;
-      })
-      .addCase(logout.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(logout.fulfilled, (state) => {
-        state.user = null;
-        state.loading = false;
-      });
+    updateUser: (state, action) => {
+      state.user = { ...state.user, ...action.payload };
+      state.loading = false;
+    },
   },
 });
 
-export const { setUser, setLoading } = authSlice.actions;
+export const { setUser, setLoading, updateUser } = authSlice.actions;
 export default authSlice.reducer;

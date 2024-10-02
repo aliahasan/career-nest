@@ -29,8 +29,7 @@ const Register = () => {
     formData.append("phoneNumber", form.phoneNumber.value);
     formData.append("password", form.password.value);
     formData.append("role", form.role.value);
-    formData.append("file", form.file.files[0]);
-
+    formData.append("image", form.image.files[0]);
     try {
       dispatch(setLoading(true));
       const response = await secureApi.post("/user/register", formData, {
@@ -102,8 +101,8 @@ const Register = () => {
                 {/* Image Upload Input */}
                 <div className="flex flex-col space-y-1.5">
                   <Input
-                    id="file"
-                    name="file"
+                    id="image"
+                    name="image"
                     required
                     type="file"
                     accept="image/*"

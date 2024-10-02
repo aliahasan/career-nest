@@ -10,13 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
 import { secureApi } from "@/hooks/useSecureApi";
 import { Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading, setUser } from "@/redux/authSlice";
-import { signInWithGoogle } from "@/redux/firebaseUser";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -36,7 +34,7 @@ const Login = () => {
       dispatch(setLoading(true));
 
       const response = await secureApi.post("/user/login", formData);
-      console.log(response)
+      console.log(response);
       if (response.data?.user) {
         dispatch(setUser(response?.data?.user));
       }
@@ -54,24 +52,24 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      dispatch(setLoading(true));
-      const result = await dispatch(signInWithGoogle()).unwrap();
-      if (result) {
-        dispatch(setUser(result));
-        toast.success("Successfully logged in with Google");
-        navigate("/");
-      } else {
-        toast.error("Failed to log in with Google");
-      }
-    } catch (error) {
-      console.error("Google Sign-In Error:", error);
-      toast.error(error?.message || "Failed to log in with Google");
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+  // const handleGoogleSignIn = async () => {
+  //   try {
+  //     dispatch(setLoading(true));
+  //     const result = await dispatch(signInWithGoogle()).unwrap();
+  //     if (result) {
+  //       dispatch(setUser(result));
+  //       toast.success("Successfully logged in with Google");
+  //       navigate("/");
+  //     } else {
+  //       toast.error("Failed to log in with Google");
+  //     }
+  //   } catch (error) {
+  //     console.error("Google Sign-In Error:", error);
+  //     toast.error(error?.message || "Failed to log in with Google");
+  //   } finally {
+  //     dispatch(setLoading(false));
+  //   }
+  // };
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
       <Card className="w-full max-w-sm">
@@ -135,15 +133,6 @@ const Login = () => {
               ) : (
                 "Login"
               )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2 my-2"
-              onClick={handleGoogleSignIn}
-            >
-              <FcGoogle className="w-5 h-5" />
-              Sign in with Google
             </Button>
           </CardFooter>
           <CardContent>

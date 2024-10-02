@@ -17,29 +17,18 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: function () {
-        return !this.isGoogleUser && this.isNew;
-      },
-      validate: {
-        validator: function (password) {
-          return this.isGoogleUser || (password && password.length > 0);
-        },
-        message: "password is required",
-      },
+      required: true,
     },
     role: {
       type: String,
-      enum: ["student", "recruiter"],
+      enum: ["student", "admin"],
       required: true,
     },
     photoURL: {
       type: String,
       default: "",
     },
-    isGoogleUser: {
-      type: Boolean,
-      default: false,
-    },
+
     profile: {
       bio: { type: String },
       skills: [{ type: String }],

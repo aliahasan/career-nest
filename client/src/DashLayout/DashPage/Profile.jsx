@@ -4,56 +4,46 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Pencil, Loader2 } from "lucide-react";
 import { secureApi } from "@/hooks/useSecureApi";
 import toast from "react-hot-toast";
-import { setUser } from "@/redux/authSlice";
-
-// Reusable component for profile information
-const InfoItem = ({ label, value }) => (
-  <div className="flex flex-col space-y-1">
-    <p className="text-sm font-medium text-gray-500">{label}</p>
-    <p className="text-base sm:text-lg break-words">{value}</p>
-  </div>
-);
+import { updateUser } from "@/redux/authSlice";
+import { EditableInput, InfoItem } from "@/shared/Reuseable";
+import { Input } from "@/components/ui/input";
 
 const Profile = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { user, loading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [editedUser, setEditedUser] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    phoneNumber: user?.phoneNumber || "",
-    skills: user?.skills || "",
+    fullName: user?.fullName || "",
+    skills: user?.profile?.skills || [],
     file: null,
     bio: user?.profile?.bio || "",
+    photoURL: user?.photoURL || null,
   });
 
-  // Toggle edit mode
   const toggleEditMode = () => setIsEditing((prev) => !prev);
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value, type, files } = e.target;
-    setEditedUser((prev) => ({
-      ...prev,
-      [name]: type === "file" ? files[0] : value,
-    }));
+    if (name === "skills") {
+      setEditedUser((prev) => ({
+        ...prev,
+        skills: value.split(",").map((skill) => skill.trim()),
+      }));
+    } else {
+      setEditedUser((prev) => ({
+        ...prev,
+        [name]: type === "file" ? files[0] : value,
+      }));
+    }
   };
 
-  // Submit edited data
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    const updatedUser = {
-      ...editedUser,
-      file: editedUser?.file || undefined,
-    };
-
+    const updatedUser = { ...editedUser, file: editedUser?.file || undefined };
     try {
       const response = await secureApi.put(
         "/user/profile/update",
@@ -64,13 +54,11 @@ const Profile = () => {
       );
       if (response.data.success) {
         setIsEditing(false);
-        dispatch(setUser(response.data?.user));
+        dispatch(updateUser(response.data?.user));
         toast.success("Profile updated successfully!");
       }
     } catch (error) {
       toast.error(error.message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -78,7 +66,6 @@ const Profile = () => {
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="flex flex-col items-center space-y-4 p-6 sm:p-8 relative">
-          {/* Edit button */}
           <Button
             variant="ghost"
             size="icon"
@@ -90,91 +77,152 @@ const Profile = () => {
 
           {/* Avatar and Profile Info */}
           <Avatar className="w-24 h-24 sm:w-32 sm:h-32">
-            <AvatarImage src={user?.photoURL} alt={user?.name} />
+            <AvatarImage src={user?.photoURL} alt={user?.fullName} />
             <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
           </Avatar>
 
           <CardTitle className="text-2xl sm:text-3xl font-bold text-center">
-            {user?.fullName || user?.displayName}
+            {user?.fullName}
           </CardTitle>
           <Badge variant="secondary" className="text-sm sm:text-base">
             {user?.role || "admin"}
           </Badge>
         </CardHeader>
 
-        {/* Profile Content */}
         <CardContent className="space-y-6 p-6 sm:p-8">
-          {/* Display Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <InfoItem label="Email" value={user?.email} />
-            <InfoItem label="Phone" value={user?.phoneNumber || null} />
-            <InfoItem label="Birth Date" value={user?.role} />
-          </div>
+          {!isEditing ? (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <InfoItem label="Email" value={user?.email} />
+                <InfoItem label="Phone" value={user?.phoneNumber} />
+              </div>
 
-          {/* Bio Section */}
-          <div className="mt-6">
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">Bio</h3>
-            <p className="text-gray-600 text-sm sm:text-base">{user?.bio}</p>
-          </div>
+              {/* Bio Section */}
+              <div className="mt-6">
+                <h3 className="text-lg sm:text-xl font-semibold mb-2">Bio</h3>
+                <p className="text-gray-600 text-sm sm:text-base">
+                  {user?.profile?.bio || "No bio available"}
+                </p>
+              </div>
 
-          {/* Skills Section */}
-          <div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">Skills</h3>
-            <div className="flex flex-wrap gap-2">
-              {user?.skills?.map((skill, index) => (
-                <Badge key={index}>{skill}</Badge>
-              ))}
-            </div>
-          </div>
-
-          {/* Edit Form */}
-          {isEditing && (
+              {/* Skills Section */}
+              <div>
+                <h3 className="text-lg sm:text-xl font-semibold mb-2">
+                  Skills
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {user?.profile?.skills?.map((skill, index) => (
+                    <Badge key={index}>{skill}</Badge>
+                  )) || "No skills added"}
+                </div>
+              </div>
+            </>
+          ) : (
             <form onSubmit={handleSubmit} className="space-y-4 mt-8">
-              <Input
-                name="name"
-                value={editedUser.name}
-                onChange={handleInputChange}
-                placeholder="Name"
-              />
-              <Input
-                name="email"
-                value={editedUser.email}
-                onChange={handleInputChange}
-                placeholder="Email"
-              />
-              <Input
-                name="phoneNumber"
-                value={editedUser.phoneNumber}
-                onChange={handleInputChange}
-                placeholder="Phone Number"
-              />
-              <Input
-                name="skills"
-                value={editedUser.skills}
-                onChange={handleInputChange}
-                placeholder="Skills (comma-separated)"
-              />
-              <Input
-                type="file"
-                name="file"
-                onChange={handleInputChange}
-                accept=".pdf"
-              />
-              <p className="mt-1 text-sm text-gray-500">
-                only pdf files are allowed:
-              </p>
-              <Textarea
-                name="bio"
-                value={editedUser.bio}
-                onChange={handleInputChange}
-                placeholder="Write something about yourself"
-                rows={4}
-              />
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? (
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Email
+                </label>
+                <Input
+                  name="email"
+                  value={editedUser.email}
+                  placeholder="Email"
+                  type="email"
+                  readOnly
+                  defaultValue={user?.email}
+                />
+                <span className="text-red-400 text-sm">
+                  email update is not applicable
+                </span>
+              </div>
+              <div>
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Full Name
+                </label>
+                <EditableInput
+                  id="fullName"
+                  name="fullName"
+                  value={editedUser.fullName}
+                  onChange={handleInputChange}
+                  placeholder="Full Name"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="skills"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Skills
+                </label>
+                <EditableInput
+                  id="skills"
+                  name="skills"
+                  value={editedUser.skills.join(", ")}
+                  onChange={handleInputChange}
+                  placeholder="Skills (comma-separated)"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="file"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  File Upload
+                </label>
+                <EditableInput
+                  id="file"
+                  name="file"
+                  type="file"
+                  onChange={handleInputChange}
+                  accept="application/pdf"
+                />
+                <span className="text-sm pl-2 text-red-600">
+                  Only .pdf file is acceptable
+                </span>
+              </div>
+              <div>
+                <label
+                  htmlFor="Image"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Image
+                </label>
+                <EditableInput
+                  id="image"
+                  name="image"
+                  type="file"
+                  onChange={handleInputChange}
+                  accept="image/*"
+                />
+                <span className="text-sm pl-2 text-red-600"></span>
+              </div>
+              <div>
+                <label
+                  htmlFor="bio"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Bio
+                </label>
+                <Textarea
+                  id="bio"
+                  name="bio"
+                  value={editedUser.bio}
+                  onChange={handleInputChange}
+                  placeholder="Bio"
+                />
+              </div>
+              <Button type="submit" disabled={loading}>
+                {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    please wait..
+                    Please wait...
                   </>
                 ) : (
                   "Save changes"
