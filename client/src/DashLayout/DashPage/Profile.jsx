@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Pencil, Loader2 } from "lucide-react";
 import { secureApi } from "@/hooks/useSecureApi";
 import toast from "react-hot-toast";
-import { updateUser } from "@/redux/authSlice";
+import { setLoading, updateUser } from "@/redux/authSlice";
 import { EditableInput, InfoItem } from "@/shared/Reuseable";
 import { Input } from "@/components/ui/input";
 
@@ -18,7 +18,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({
     fullName: user?.fullName || "",
-    skills: user?.profile?.skills || [],
+    skills: user?.profile?.skills?.join(", ") || "",
     file: null,
     bio: user?.profile?.bio || "",
     photoURL: user?.photoURL || null,
@@ -28,22 +28,20 @@ const Profile = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, files } = e.target;
-    if (name === "skills") {
-      setEditedUser((prev) => ({
-        ...prev,
-        skills: value.split(",").map((skill) => skill.trim()),
-      }));
-    } else {
-      setEditedUser((prev) => ({
-        ...prev,
-        [name]: type === "file" ? files[0] : value,
-      }));
-    }
+    setEditedUser((prev) => ({
+      ...prev,
+      [name]: type === "file" ? files[0] : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const updatedUser = { ...editedUser, file: editedUser?.file || undefined };
+    dispatch(setLoading(true));
+    const updatedUser = {
+      ...editedUser,
+      file: editedUser?.file || undefined,
+      skills: editedUser.skills.split(",").map((skill) => skill.trim()),
+    };
     try {
       const response = await secureApi.put(
         "/user/profile/update",
@@ -59,6 +57,8 @@ const Profile = () => {
       }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
@@ -164,7 +164,7 @@ const Profile = () => {
                 <EditableInput
                   id="skills"
                   name="skills"
-                  value={editedUser.skills.join(", ")}
+                  value={editedUser.skills}
                   onChange={handleInputChange}
                   placeholder="Skills (comma-separated)"
                 />

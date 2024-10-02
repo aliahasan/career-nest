@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import getDataUri from "../utils/data-uri.js";
 import cloudinary from "../utils/cloudinary.js";
+import { uploadImage, uploadResume } from "../utils/uploader.js";
 
 // create a new user
 export const register = async (req, res) => {
@@ -161,22 +162,34 @@ export const updateUser = async (req, res) => {
     }
     let updatedProfile = currentUser.profile || {};
 
-    if (req.files) {
-      if (req.files.image && req.files.image[0]) {
-        const photoUri = getDataUri(req.files.image[0]);
-        const cloudResponse = await cloudinary.uploader.upload(
-          photoUri.content
-        );
-        updateData.photoURL = cloudResponse.secure_url;
-      }
-
-      if (req.files.file && req.files.file[0]) {
-        const fileUri = getDataUri(req.files.file[0]);
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-        updatedProfile.resume = cloudResponse.secure_url;
-        updatedProfile.resumeName = req.files.file[0].originalname;
-      }
+    // image upload
+    if (req.files && req.files.image && req.files.image[0]) {
+      updateData.photoURL = await uploadImage(req.files.image[0]);
     }
+    // resume upload
+    if (req.files && req.files.file && req.files.file[0]) {
+      const { resumeUrl, resumeName } = await uploadResume(req.files.file[0]);
+      updatedProfile.resume = resumeUrl;
+      updatedProfile.resumeName = resumeName;
+    }
+
+    // if (req.files) {
+    //   // image update
+    //   if (req.files.image && req.files.image[0]) {
+    //     const photoUri = getDataUri(req.files.image[0]);
+    //     const cloudResponse = await cloudinary.uploader.upload(
+    //       photoUri.content
+    //     );
+    //     updateData.photoURL = cloudResponse.secure_url;
+    //   }
+    //   // resume update
+    //   if (req.files.file && req.files.file[0]) {
+    //     const fileUri = getDataUri(req.files.file[0]);
+    //     const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+    //     updatedProfile.resume = cloudResponse.secure_url;
+    //     updatedProfile.resumeName = req.files.file[0].originalname;
+    //   }
+    // }
 
     if (updateData?.bio != null) {
       updatedProfile.bio = updateData.bio.trim();
