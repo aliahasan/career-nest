@@ -159,20 +159,23 @@ export const updateUser = async (req, res) => {
         success: false,
       });
     }
-
-    if (req.files) {
-      const photoUri = getDataUri(req.files.image[0]);
-      const cloudResponse = await cloudinary.uploader.upload(photoUri.content);
-      updateData.photoURL = cloudResponse.secure_url;
-    }
-
     let updatedProfile = currentUser.profile || {};
 
     if (req.files) {
-      const fileUri = getDataUri(req.files.file[0]);
-      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-      updatedProfile.resume = cloudResponse.secure_url;
-      updatedProfile.resumeName = req.files.file[0].originalname;
+      if (req.files.image && req.files.image[0]) {
+        const photoUri = getDataUri(req.files.image[0]);
+        const cloudResponse = await cloudinary.uploader.upload(
+          photoUri.content
+        );
+        updateData.photoURL = cloudResponse.secure_url;
+      }
+
+      if (req.files.file && req.files.file[0]) {
+        const fileUri = getDataUri(req.files.file[0]);
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+        updatedProfile.resume = cloudResponse.secure_url;
+        updatedProfile.resumeName = req.files.file[0].originalname;
+      }
     }
 
     if (updateData?.bio != null) {
