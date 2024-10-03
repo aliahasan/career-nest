@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ChevronDown, } from "lucide-react"; 
+import { ChevronDown } from "lucide-react";
 
 const filterData = [
   {
@@ -23,9 +23,14 @@ const filterData = [
 
 const FilterJob = () => {
   const [openFilter, setOpenFilter] = useState(null);
+  const [selectedJobType, setSelectedJobType] = useState(null);
 
   const toggleFilter = (filterType) => {
     setOpenFilter(openFilter === filterType ? null : filterType);
+  };
+
+  const handleJobTypeChange = (value) => {
+    setSelectedJobType(value);
   };
 
   return (
@@ -55,7 +60,14 @@ const FilterJob = () => {
                   : "max-h-0 opacity-0"
               }`}
             >
-              <RadioGroup className="transition-all duration-500 ease-in-out transform origin-top">
+              <RadioGroup
+                className="transition-all duration-500 ease-in-out transform origin-top"
+                onValueChange={
+                  filter.filterType === "Job-Type"
+                    ? handleJobTypeChange
+                    : undefined
+                }
+              >
                 {filter.filterOptions.map((option, optionIndex) => (
                   <div
                     className={`flex items-center space-x-2 mb-2 transition-all duration-300 ease-in-out transform ${
@@ -82,6 +94,7 @@ const FilterJob = () => {
           </div>
         ))}
       </div>
+      {selectedJobType && <p className="mt-4">Job Type: {selectedJobType}</p>}
     </div>
   );
 };

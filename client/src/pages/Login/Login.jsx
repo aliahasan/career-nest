@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { secureApi } from "@/hooks/useSecureApi";
 import { Loader2 } from "lucide-react";
@@ -20,7 +20,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { loading } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
-
+  const location = useLocation();
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -34,13 +34,13 @@ const Login = () => {
       dispatch(setLoading(true));
 
       const response = await secureApi.post("/user/login", formData);
-      console.log(response);
       if (response.data?.user) {
         dispatch(setUser(response?.data?.user));
       }
       if (response.data?.success) {
         toast.success("Login successful");
-        navigate("/");
+        const from = location.state?.from || "/";
+        navigate(from, { replace: true });
       } else {
         toast.error(response.data?.message);
       }
@@ -51,25 +51,6 @@ const Login = () => {
       form.reset();
     }
   };
-
-  // const handleGoogleSignIn = async () => {
-  //   try {
-  //     dispatch(setLoading(true));
-  //     const result = await dispatch(signInWithGoogle()).unwrap();
-  //     if (result) {
-  //       dispatch(setUser(result));
-  //       toast.success("Successfully logged in with Google");
-  //       navigate("/");
-  //     } else {
-  //       toast.error("Failed to log in with Google");
-  //     }
-  //   } catch (error) {
-  //     console.error("Google Sign-In Error:", error);
-  //     toast.error(error?.message || "Failed to log in with Google");
-  //   } finally {
-  //     dispatch(setLoading(false));
-  //   }
-  // };
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
       <Card className="w-full max-w-sm">

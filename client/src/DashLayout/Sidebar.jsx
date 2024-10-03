@@ -1,12 +1,13 @@
 import { X } from "lucide-react";
-import {  useState } from "react";
+import { useState } from "react";
 import { AiOutlineBars } from "react-icons/ai";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import UserMenu from "./DashPage/UserMenu";
 
 const Sidebar = () => {
-
   const [isOpen, setIsOpen] = useState(false);
-
+  const { user } = useSelector((state) => state.auth);
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
@@ -36,20 +37,22 @@ const Sidebar = () => {
       >
         {/* Sidebar Header and Close Button */}
         <div className="flex justify-end md:hidden p-4">
-          <button onClick={handleToggle} className="text-gray-500 focus:outline-none">
-           <X className="h-6 w-6" />
+          <button
+            onClick={handleToggle}
+            className="text-gray-500 focus:outline-none"
+          >
+            <X className="h-6 w-6" />
           </button>
         </div>
 
         {/* Sidebar content: make scrollable */}
         <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
-          <ul className="space-y-2">
-            {Array.from({ length: 5 }).map((_, idx) => (
+          {/* {Array.from({ length: 5 }).map((_, idx) => (
               <li key={idx} className="p-2 bg-white shadow-sm rounded-md cursor-pointer">
                 Menu Item {idx + 1}
               </li>
-            ))}
-          </ul>
+            ))} */}
+          {user && user?.role === "student" && <UserMenu />}
         </div>
       </aside>
 

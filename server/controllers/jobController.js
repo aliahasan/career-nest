@@ -80,8 +80,8 @@ export const getAllJobs = async (req, res) => {
     // Calculate pagination values
     const skip = (page - 1) * limit;
 
-    // Find jobs with search, filtering, and pagination
     const jobs = await Job.find(query)
+      .populate("company")
       .skip(skip) // Pagination
       .limit(Number(limit))
       .sort({ createdAt: -1 });

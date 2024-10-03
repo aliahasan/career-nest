@@ -5,11 +5,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Pencil, Loader2 } from "lucide-react";
+import {
+  Pencil,
+  Loader2,
+  Mail,
+  Phone,
+  FileText,
+  Briefcase,
+} from "lucide-react";
 import { secureApi } from "@/hooks/useSecureApi";
 import toast from "react-hot-toast";
 import { setLoading, updateUser } from "@/redux/authSlice";
-import { EditableInput, InfoItem } from "@/shared/Reuseable";
+import { EditableInput } from "@/shared/Reuseable";
 import { Input } from "@/components/ui/input";
 
 const Profile = () => {
@@ -17,7 +24,7 @@ const Profile = () => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({
-    fullName: user?.fullName || "",
+    fullName: user?.fullName.trim() || "",
     skills: user?.profile?.skills?.join(", ") || "",
     file: null,
     bio: user?.profile?.bio || "",
@@ -85,7 +92,7 @@ const Profile = () => {
             {user?.fullName}
           </CardTitle>
           <Badge variant="secondary" className="text-sm sm:text-base">
-            {user?.role || "admin"}
+            {user?.role || "none"}
           </Badge>
         </CardHeader>
 
@@ -93,21 +100,40 @@ const Profile = () => {
           {!isEditing ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <InfoItem label="Email" value={user?.email} />
-                <InfoItem label="Phone" value={user?.phoneNumber} />
+                <div className="flex items-center space-x-2">
+                  <Mail className="h-5 w-5 text-gray-500" />
+                  <span>{user?.email}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Phone className="h-5 w-5 text-gray-500" />
+                  <span>{user?.phoneNumber}</span>
+                </div>
+                <div>
+                  <span>
+                    Last Login: {new Date(user.lastLogin).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <FileText className="h-5 w-5 text-gray-500" />
+                  <span className="text-blue-500 underline underline-offset-2 ">
+                    <a
+                      href={user?.profile?.resume}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {user?.profile.resumeName}
+                    </a>
+                  </span>
+                </div>
               </div>
 
               {/* Bio Section */}
-              <div className="mt-6">
-                <h3 className="text-lg sm:text-xl font-semibold mb-2">Bio</h3>
-                <p className="text-gray-600 text-sm sm:text-base">
-                  {user?.profile?.bio || "No bio available"}
-                </p>
-              </div>
 
               {/* Skills Section */}
               <div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-2">
+                <h3 className="text-lg sm:text-xl font-semibold mb-2 flex items-center">
+                  <Briefcase className="h-5 w-5 text-gray-500 mr-2" />
                   Skills
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -115,6 +141,12 @@ const Profile = () => {
                     <Badge key={index}>{skill}</Badge>
                   )) || "No skills added"}
                 </div>
+              </div>
+              <div className="mt-6">
+                <h3 className="text-lg sm:text-xl font-semibold mb-2">Bio</h3>
+                <p className="text-gray-600 text-sm sm:text-base">
+                  {user?.profile?.bio || "No bio available"}
+                </p>
               </div>
             </>
           ) : (

@@ -11,6 +11,7 @@ import Jobs from "@/pages/Jobs/Jobs";
 import Login from "@/pages/Login/Login";
 import NotFound from "@/pages/NotFound/NotFound";
 import Register from "@/pages/Register/Register";
+import PrivateRoutes from "@/PriveRoutes/PrivateRoutes";
 import { createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([
@@ -56,11 +57,19 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Dashboard></Dashboard>,
+        element: (
+          <PrivateRoutes>
+            <Dashboard />
+          </PrivateRoutes>
+        ),
       },
       {
         path: "profile",
-        element: <Profile />,
+        element: (
+          <PrivateRoutes>
+            <Profile />,
+          </PrivateRoutes>
+        ),
       },
       {
         path: "applied-jobs",

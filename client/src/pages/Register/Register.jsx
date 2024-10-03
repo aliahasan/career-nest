@@ -24,7 +24,7 @@ const Register = () => {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData();
-    formData.append("fullName", form.fullName.value);
+    formData.append("fullName", form.fullName.value.trim())
     formData.append("email", form.email.value);
     formData.append("phoneNumber", form.phoneNumber.value);
     formData.append("password", form.password.value);
