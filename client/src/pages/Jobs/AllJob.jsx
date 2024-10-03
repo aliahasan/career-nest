@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { timeAgo } from "@/utils/helper";
 import { Briefcase, Clock, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -41,13 +42,13 @@ const AllJob = ({ job }) => {
               {job?.location}
             </div>
             <div className="flex items-center text-sm text-gray-500">
-            <Briefcase className="w-4 h-4 mr-2" /> Experience :
-            <span className="px-2">{job?.experienceLevel}</span>
-            year
-          </div>
+              <Briefcase className="w-4 h-4 mr-2" /> Experience :
+              <span className="px-2">{job?.experienceLevel}</span>
+              year
+            </div>
             <div className="flex items-center text-sm text-gray-500">
               <Clock className="w-4 h-4 mr-2" />
-              {new Date(job.createdAt).toLocaleDateString()}
+              {timeAgo(job?.createdAt)}
             </div>
           </div>
           <p className="text-sm text-gray-600 mb-4">{job?.description}</p>
