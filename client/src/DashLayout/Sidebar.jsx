@@ -4,6 +4,7 @@ import { AiOutlineBars } from "react-icons/ai";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import UserMenu from "./DashPage/UserMenu";
+import RecruiterMenu from "./DashPage/RecruiterMenu";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +36,6 @@ const Sidebar = () => {
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Sidebar Header and Close Button */}
         <div className="flex justify-end md:hidden p-4">
           <button
             onClick={handleToggle}
@@ -44,19 +44,12 @@ const Sidebar = () => {
             <X className="h-6 w-6" />
           </button>
         </div>
-
-        {/* Sidebar content: make scrollable */}
-        <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
-          {/* {Array.from({ length: 5 }).map((_, idx) => (
-              <li key={idx} className="p-2 bg-white shadow-sm rounded-md cursor-pointer">
-                Menu Item {idx + 1}
-              </li>
-            ))} */}
+        <div className="flex-1 overflow-y-auto p-4 scrollbar-hide mt-10 ">
+          {/* conditional sidebar here */}
           {user && user?.role === "student" && <UserMenu />}
+          {user && user?.role === "recruiter" && <RecruiterMenu />}
         </div>
       </aside>
-
-      {/* Backdrop for mobile */}
       {isOpen && (
         <div
           onClick={handleToggle}

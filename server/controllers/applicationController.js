@@ -1,40 +1,62 @@
 import Application from "../models/application.model.js";
 import Job from "../models/job.model.js";
+import { uploadResume } from "../utils/uploader.js";
 
 export const applyJob = async (req, res) => {
   try {
+    const { name, email } = req.body;
+    let { resume } = req.body;
     const userId = req.user.userId;
     const jobId = req.params.id;
+
     if (!userId || !jobId) {
       return res.status(400).json({
-        message: "Job ID is required.",
+        message: "Job ID and User ID are required.",
         success: false,
       });
     }
+
+    // Check if the user has already applied to the job
     const existingApplication = await Application.findOne({
       job: jobId,
       applicant: userId,
     });
+
     if (existingApplication) {
       return res.status(400).json({
         message: "You have already applied to this job.",
         success: false,
       });
     }
+
+    // Find the job by ID
     const job = await Job.findById(jobId);
     if (!job) {
       return res.status(404).json({
-        message: "No job found",
+        message: "No job found.",
         success: false,
       });
     }
-    // create a new application
+
+    // here i uploaded the resume
+    if (req.files && req.files.file && req.files.file[0]) {
+      const { resumeUrl } = await uploadResume(req.files.file[0]);
+      resume = resumeUrl;
+    }
+
+    // Create a new application
     const newApplication = await Application.create({
+      name,
+      email,
       job: jobId,
       applicant: userId,
+      resume: resume || null,
     });
+
+    // Add the application to the job
     job.applications.push(newApplication._id);
     await job.save();
+
     return res.status(201).json({
       message: "Application submitted successfully.",
       success: true,
@@ -42,7 +64,7 @@ export const applyJob = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      message: error.message,
+      message: error.message || "Internal server error",
       success: false,
     });
   }

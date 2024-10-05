@@ -2,6 +2,15 @@ import mongoose from "mongoose";
 
 const applicationSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+
     job: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Job",
@@ -10,6 +19,10 @@ const applicationSchema = new mongoose.Schema(
     applicant: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    resume: {
+      type: String,
       required: true,
     },
     status: {

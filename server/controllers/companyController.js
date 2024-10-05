@@ -1,16 +1,11 @@
 import Company from "../models/company.model.js";
+import { uploadImage } from "../utils/uploader.js";
 
 export const createCompany = async (req, res) => {
   try {
-    const { companyName } = req.body;
+    const { companyName, website, location, description } = req.body;
+
     const ownerId = req.user.userId;
-    console.log(ownerId);
-    if (!companyName) {
-      return res.status(400).json({
-        message: "Company name is required",
-        success: false,
-      });
-    }
     const company = await Company.findOne({ companyName });
     if (company) {
       return res.status(400).json({
@@ -18,7 +13,18 @@ export const createCompany = async (req, res) => {
         success: false,
       });
     }
+
+    let companyLogo;
+    if (req.files && req.files.image && req.files.image[0]) {
+      const logoImage = await uploadImage(req.files.image[0]);
+      companyLogo = logoImage;
+    }
+    console.log(companyName, companyLogo, website, location, description);
     const newCompany = await Company.create({
+      website,
+      logo: companyLogo,
+      location,
+      description,
       companyName,
       ownerId,
     });
@@ -61,12 +67,12 @@ export const getCompanies = async (req, res) => {
   }
 };
 
-// get company by id
+// get all companies of  recruiter by his id
 export const getCompanyById = async (req, res) => {
   try {
-    const companyId = req.params.id;
-    const company = await Company.findById(companyId);
-    if (!company) {
+    const userId = req.params.id;
+    const companies = await Company.findById(userId);
+    if (!companies) {
       return res.status(404).json({
         message: "Company not found",
         success: false,
@@ -75,7 +81,7 @@ export const getCompanyById = async (req, res) => {
     return res.status(200).json({
       message: "Company retrieved successfully",
       success: true,
-      company: company,
+      companies: companies,
     });
   } catch (error) {
     console.error(error);
@@ -91,7 +97,6 @@ export const updateCompanyById = async (req, res) => {
   try {
     const { companyName, description, website, location } = req.body;
     const id = req.params.id;
-    const file = req.file;
     // cloudinary upload here------------------
     const updatedData = {
       companyName,

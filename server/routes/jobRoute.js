@@ -11,6 +11,6 @@ const router = express.Router();
 router.route("/create-job").post(verifyUser, createJob);
 router.route("/get-jobs").get(getAllJobs);
 router.route("/get-job/:id").get(getJobById);
-router.route("/get-admin-jobs").get(verifyUser, getAllJobsOfAdmin);
+router.route("/get-recruiter-jobs").get(verifyUser, getAllJobsOfAdmin);
 
 export default router;

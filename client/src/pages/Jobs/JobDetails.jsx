@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Briefcase, DollarSign } from "lucide-react";
-import Loading from "@/myComponents/Loading";
 import ApplyJobDialog from "@/myComponents/ApplyDialog";
 import LoginAlert from "@/myComponents/LoginAlert";
 
@@ -32,16 +31,8 @@ const JobDetails = () => {
 
   const { singleJob } = useSelector((state) => state.jobs);
   const job = singleJob?.job;
-  // const userId = "66f26527cbdcdf6a5bcc0a6e";
-  // const applicant = job?.applications.find((id) => id === userId);
-
   if (error) return <div className="text-red-500 text-center">{error}</div>;
-  if (!job)
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
+  if (!job) return <div className="text-center">No job Found</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -92,7 +83,7 @@ const JobDetails = () => {
             </div>
           </div>
           {user ? (
-            <ApplyJobDialog jobTitle={job?.title} jobId={job._id} />
+            <ApplyJobDialog jobTitle={job?.title} jobId={job._id} job={job} />
           ) : (
             <Button onClick={() => setShowLoginAlert(true)}>Apply</Button>
           )}

@@ -14,9 +14,12 @@ import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import { secureApi } from "@/hooks/useSecureApi";
 import { Loader2 } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const ApplyJobDialog = ({ jobTitle, jobId, userId }) => {
   const [open, setOpen] = useState(false);
+  const { user } = useSelector((store) => store.auth);
+  const role = user?.role;
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,40 +49,48 @@ const ApplyJobDialog = ({ jobTitle, jobId, userId }) => {
 
   const submitApplication = async (data) => {
     setIsLoading(true);
-  
     const form = new FormData();
     form.append("name", data.name);
     form.append("email", data.email);
     form.append("file", data.file);
     form.append("applicant", userId);
     form.append("job", jobId);
-  
+
     try {
-      const response = await secureApi.post(`/application/apply-job/${jobId}`, form);
-  
+      const response = await secureApi.post(
+        `/application/apply-job/${jobId}`,
+        form
+      );
+
       if (response.data?.success) {
         toast.success(response.data.message);
-        setOpen(false);
+        setOpen(false); 
       } else {
         toast.error(response.data?.message || "Failed to submit application");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred while submitting your application");
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while submitting your application"
+      );
     } finally {
       setIsLoading(false);
     }
   };
-  
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!fileError) submitApplication(formData);
+    setIsLoading(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full md:w-auto px-6 py-3 text-base font-semibold hover:scale-105">
+        <Button
+          className="w-full md:w-auto px-6 py-3 text-base font-semibold hover:scale-105"
+          disabled={role === "recruiter"}
+        >
           Apply Now
         </Button>
       </DialogTrigger>
